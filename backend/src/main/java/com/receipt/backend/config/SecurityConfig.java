@@ -28,7 +28,7 @@ public class SecurityConfig {
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
 
-    @Value("${frontend.url}")
+    @Value("${FRONTEND_URL}")
     private String frontendUrl;
 
     @Bean
@@ -43,9 +43,13 @@ public class SecurityConfig {
                                         "/api/images/**",
                                         "/oauth2/**",
                                         "/login/oauth2/**",
-                                        "/error"
+                                        "/error",
+                                        "/h2-console/**"
                                 ).permitAll()
                                 .anyRequest().authenticated()
+                )
+                .headers(headers -> headers
+                        .frameOptions(frame -> frame.sameOrigin()) // H2 콘솔이 iframe 쓰므로 sameOrigin 허용
                 )
                 .oauth2Login(oauth2 -> oauth2
                         .successHandler(oAuth2SuccessHandler)
@@ -60,7 +64,6 @@ public class SecurityConfig {
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        /*SecurityFilterChain에 추가해야 쓸수 있다(다른 방법으로 컨트롤러에 추가..등 여럿)*/
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of(frontendUrl));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));

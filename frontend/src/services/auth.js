@@ -1,0 +1,45 @@
+import api from "./api";
+
+export const authService = {
+  async login(userData) {
+    const response = await api.post("/api/auth/login", userData);
+    const { access_token, refresh_token, user } = response.data;
+
+    localStorage.setItem("accessToken", access_token);
+    localStorage.setItem("refreshToken", refresh_token);
+    localStorage.setItem("user", JSON.stringify(user));
+
+    return response.data;
+  },
+
+  async register(userData) {
+    const response = await api.post("/api/auth/register", userData);
+    //전송,응답 정상동작을 console.log(response); 여러번 확인 후 리턴 토큰을 받아서 구조분해하는 작업
+    const { access_token, refresh_token, user } = response.data;
+
+    localStorage.setItem("accessToken", access_token);
+    localStorage.setItem("refreshToken", refresh_token);
+    localStorage.setItem("user", JSON.stringify(user));
+
+    return response.data;
+  },
+
+  logout() {
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    localStorage.removeItem("user");
+  },
+
+  getCurrentUser: () => {
+    const userStr = localStorage.getItem("user");
+    return userStr ? JSON.parse(userStr) : null;
+  },
+
+  isAuthenticated: () => {
+    //서버 통신이 아닌 로컬에서 가져오는 것으로 조작이 가능하나, 나의 화면에서만 바뀌는 조작정도.
+    //가장간단한 javascript 방식  !!true -> !false -> true
+    // "aaaaa1@test.co.kr" => true
+    // "", null => false
+    return !!localStorage.getItem("accessToken");
+  },
+};
