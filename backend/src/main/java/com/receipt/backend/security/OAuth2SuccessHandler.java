@@ -23,7 +23,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     private final JwtService jwtService;
     private final UserRepository userRepository;
 
-    @Value("${frontend.url}")
+    @Value("${FRONTEND_URL}")
     private String frontendUrl;
 
     @Override
