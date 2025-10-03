@@ -49,13 +49,11 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-cyan-400 via-amber-400 to-green-500">
+    <div className="flex flex-col justify-center items-center ">
       <div className="max-w-[420px] space-y-6 my-12">
         <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl px-12 py-14">
-          <h1 className="text-center mb-6">
-            <span className="text-6xl font-extrabold bg-gradient-to-r from-orange-600 via-yellow-300 to-purple-500 bg-clip-text text-transparent">
-              멋쟁이사자 인스타그램
-            </span>
+          <h1 className="text-center mb-6 font-bold">
+            <span className="text-5xl text-amber-600">데이터랑 놀자!</span>
           </h1>
 
           <form className="space-y-4" onSubmit={handleSubmit}>
@@ -122,7 +120,7 @@ const Login = () => {
             Don't have an account?{" "}
             <Link
               to="/signup"
-              className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent font-semibold hover:from-purple-700 hover:to-pink-700 transition-all "
+              className="bg-gradient-to-r from-amber-600 to-red-600 bg-clip-text text-transparent font-semibold hover:from-purple-700 hover:to-pink-700 transition-all "
             >
               Sign up
             </Link>

@@ -36,10 +36,6 @@ export const authService = {
   },
 
   isAuthenticated: () => {
-    //서버 통신이 아닌 로컬에서 가져오는 것으로 조작이 가능하나, 나의 화면에서만 바뀌는 조작정도.
-    //가장간단한 javascript 방식  !!true -> !false -> true
-    // "aaaaa1@test.co.kr" => true
-    // "", null => false
     return !!localStorage.getItem("accessToken");
   },
 };

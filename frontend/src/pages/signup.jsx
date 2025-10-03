@@ -51,16 +51,14 @@ const Signup = () => {
       <div className="max-w-[420px] space-y-6 my-12">
         <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl px-12 py-14">
           <h1 className="text-center mb-6 font-bold">
-            <span className="text-6xl bg-gradient-to-r from-orange-600 via-yellow-300 to-purple-500 bg-clip-text text-transparent">
-              데이터랑<p></p>놀자~
-            </span>
+            <span className="text-5xl text-amber-600">데이터랑 놀자!</span>
           </h1>
 
-          <p className="text-center text-gray-600 font-medium mb-10 text-base">
+          {/*<p className="text-center text-gray-600 font-medium mb-10 text-base">
             데이터관리를 위한 회원가입을 해주세요!
-          </p>
+          </p>*/}
 
-          <div className="space-y-4 mb-8">
+          <div className="space-y-4 mb-8 mt-12">
             <Button variant="secondary" icon={<FcGoogle className="w-6 h-6" />}>
               Continue with Google
             </Button>
@@ -80,7 +78,7 @@ const Signup = () => {
             <Input
               type="email"
               name="email"
-              placeholder="Email address"
+              placeholder="Email Address"
               value={formData.email}
               onChange={handleChange}
               required
@@ -88,7 +86,7 @@ const Signup = () => {
             <Input
               type="text"
               name="fullName"
-              placeholder="fullName"
+              placeholder="FullName"
               value={formData.fullName}
               onChange={handleChange}
               required
@@ -125,7 +123,7 @@ const Signup = () => {
             회원이신가요?{" "}
             <Link
               to="/login"
-              className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent font-semibold hover:from-purple-700 hover:to-pink-700 transition-all "
+              className="bg-gradient-to-r from-amber-600 to-red-600 bg-clip-text text-transparent font-semibold hover:from-purple-700 hover:to-pink-700 transition-all "
             >
               Log in
             </Link>
