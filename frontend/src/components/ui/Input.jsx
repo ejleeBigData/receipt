@@ -5,7 +5,6 @@ const Input = ({
   onChange,
   name,
   required = false,
-  className = "",
 }) => {
   return (
     <input

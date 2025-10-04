@@ -7,6 +7,7 @@ const Button = ({
   disabled = false,
   icon = null,
   className = "",
+  block = true, //기본은 block(가록 꽉)
   ...rest
 }) => {
   const sizes = {

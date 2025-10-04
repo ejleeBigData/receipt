@@ -1,30 +1,20 @@
 import api from "./api";
 
-const stemApi = {
-  getCategoryById: async () => {
-    const response = await api.get(`/categories`);
+const categoryService = {
+  createCategory: async (data) => {
+    const response = await api.post("/api/categories", data);
     return response.data;
   },
 
-  getAllCategoryById: async () => {
-    const response = await api.get(`/categories/all`);
-    return response.data;
-  },
-
-  createStem: async (stemData) => {
-    const response = await api.post("/categories", stemData);
-    return response.data;
-  },
-
-  updateStem: async (stemId, stemData) => {
-    const response = await api.put(`/categories/${stemId}`, stemData);
-    return response.data;
-  },
-
-  deleteStem: async (stemId) => {
-    const response = await api.delete(`/categories/${stemId}`);
+  getUserCategories: async (userId, page = 0, size = 50) => {
+    const response = await api.get(
+      `/api/categories/user/${encodeURIComponent(userId)}`,
+      {
+        params: { page, size },
+      }
+    );
     return response.data;
   },
 };
 
-export default stemApi;
+export default categoryService;
