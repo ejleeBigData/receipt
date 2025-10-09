@@ -15,9 +15,7 @@ const CategoryList = () => {
   } = useCategoryStore();
 
   useEffect(() => {
-    if (user?.id) {
-      void listMyCategories();
-    }
+    if (user?.id) void listMyCategories();
   }, [user?.id, listMyCategories]);
 
   if (!user?.id) {

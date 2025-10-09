@@ -79,7 +79,7 @@ const CategoryForm = () => {
       <div className="mb-3 border-b border-sky-200 pb-1 flex items-center gap-3">
         <h6 className="text-sky-600">{editingId ? "수정" : "신규 등록"}</h6>
         <span className="text-xs text-gray-500">
-          <span className="text-red-500">*</span> 은 필수 입력
+          <span className="text-red-500">*</span> 필수 입력
         </span>
         {"    "}
         {isDup && (

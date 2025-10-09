@@ -2,7 +2,7 @@ const InputToday = () => {
   const today = new Date().toISOString().split("T")[0];
 
   return (
-    <div className="flex items-center gap-2 m-2">
+    <div className="flex items-center gap-2 mb-2">
       <label className="w-20">구매 날짜</label>
       <input
         type="date"

@@ -36,7 +36,7 @@ const InputCategory = ({
     <div>
       <label className="block mb-1 font-semibold">{label}</label>
       <input
-        list="category-list"
+        list={listId}
         value={inputValue}
         onChange={handleChange}
         onBlur={handleBlur}
@@ -44,7 +44,7 @@ const InputCategory = ({
         focus:ring-2 focus:ring-sky-100 outline-none ${className}`}
         placeholder="카테고리 선택"
       />
-      <datalist id="category-list">
+      <datalist id={listId}>
         {options.map((cat) => (
           <option key={cat.stem_id} value={cat.stem_name} />
         ))}

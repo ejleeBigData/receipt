@@ -13,12 +13,10 @@ const Button = ({
   // ✅ 오타 prop이 DOM으로 퍼지지 않도록 제거
   const { blcok: _ignoreBlcok, ...domProps } = rest;
 
-  // ✅ block에 따라 폭 제어
   const width = block ? "w-full" : "w-auto";
   const base =
     "transition-all duration-200 inline-flex items-center justify-center";
 
-  // ✅ sizes에서 w-full 제거 (block이 폭을 제어)
   const sizes = {
     lg: "py-3 rounded-xl font-semibold text-base",
     sm: "py-1 rounded-md font-semibold text-sm",

@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
+import useAuthStore from "../../store/authStore";
+import useCategoryStore from "../../store/categoryStore";
 import InputCategory from "./InputCategory";
 import InputItem from "./InputItem";
 import InputPrice from "./InputPrice";
@@ -12,9 +14,20 @@ const emptyRow = {
 };
 
 const InputDirect = () => {
-  const { me, isAuthed, loading } = useAuthStore();
-  const userId = me?.userId;
-  const { options, error } = userCategory(userId);
+  const { user } = useAuthStore();
+  const { categories, loading, listMyCategories } = useCategoryStore();
+
+  useEffect(() => {
+    if (user?.id) void listMyCategories();
+  }, [user?.id, listMyCategories]);
+
+  const options = useMemo(
+    () =>
+      (categories ?? [])
+        .map((c) => ({ stem_id: c.id, stem_name: c.name }))
+        .sort((a, b) => a.stem_name.localeCompare(b.stem_name)),
+    [categories]
+  );
 
   // 5줄 초기화
   const [rows, setRows] = useState(
@@ -27,8 +40,8 @@ const InputDirect = () => {
     );
   };
 
-  if (loading) return <p>로딩 중...</p>;
-  if (error) return <p>에러 발생: {error}</p>;
+  //if (loading) return <p>로딩 중...</p>;
+  //if (error) return <p>에러 발생: {error}</p>;
 
   return (
     <div className="m-1 p-1 border border-gray-300 rounded-lg shadow-sm bg-white font-gowun">
