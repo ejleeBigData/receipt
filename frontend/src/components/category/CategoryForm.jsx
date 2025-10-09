@@ -1,11 +1,18 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import Button from "../ui/Button";
 import InputText from "./InputText";
 import useCategoryStore from "../../store/categoryStore";
 
 const CategoryForm = () => {
   const orders = useMemo(() => Array.from({ length: 50 }, (_, i) => i + 1), []);
-  const { createCategory, loading } = useCategoryStore();
+  const {
+    categories,
+    createCategory,
+    updateCategory,
+    loading,
+    editingId, // 수정 타깃
+    cancelEdit, // 수정 취소
+  } = useCategoryStore();
 
   const [form, setForm] = useState({
     name: "",
@@ -13,6 +20,22 @@ const CategoryForm = () => {
     accrue: false,
     cut: "",
   });
+
+  useEffect(() => {
+    if (editingId) {
+      const target = categories.find((c) => c.id === editingId);
+      if (target) {
+        setForm({
+          name: target.name ?? "",
+          sort: target.sort ?? 1,
+          accrue: !!target.accrue,
+          cut: target.cut ?? "",
+        });
+      }
+    } else {
+      setForm({ name: "", sort: 1, accrue: false, cut: "" });
+    }
+  }, [editingId, categories]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -25,7 +48,12 @@ const CategoryForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await createCategory(form);
+      if (editingId) {
+        await updateCategory(editingId, form);
+        cancelEdit(); // 완료 후 편집 종료
+      } else {
+        await createCategory(form);
+      }
       setForm({ name: "", sort: 1, accrue: false, cut: "" });
     } catch (error) {
       console.error("Error creating category:", error);
@@ -38,7 +66,7 @@ const CategoryForm = () => {
       className="m-1 p-3 border border-gray-300 rounded-lg shadow-sm bg-white font-gowun"
     >
       <div className="mb-3 border-b border-sky-200 pb-1 flex items-center gap-3">
-        <h6 className="text-sky-600">신규 등록</h6>
+        <h6 className="text-sky-600">{editingId ? "수정" : "신규 등록"}</h6>
         <span className="text-xs text-gray-500">
           <span className="text-red-500">*</span> 은 필수 입력 항목입니다.
         </span>
@@ -113,9 +141,27 @@ const CategoryForm = () => {
               min="0"
             />
           </div>
-          <Button type="submit" variant="base" size="sm">
-            {loading ? "등록 중..." : "등록"}
-          </Button>
+          <div className="min-w-20 flex items-center gap-1">
+            <Button type="submit" variant="base" size="sm">
+              {loading
+                ? editingId
+                  ? "수정 중..."
+                  : "등록 중..."
+                : editingId
+                ? "저장"
+                : "등록"}
+            </Button>
+            {editingId && (
+              <Button
+                type="button"
+                variant="basecancel"
+                size="sm"
+                onClick={cancelEdit}
+              >
+                취소
+              </Button>
+            )}
+          </div>
         </div>
       </div>
     </form>

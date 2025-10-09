@@ -6,13 +6,18 @@ const categoryService = {
     return response.data;
   },
 
-  getUserCategories: async (userId, page = 0, size = 50) => {
-    const response = await api.get(
-      `/api/categories/user/${encodeURIComponent(userId)}`,
-      {
-        params: { page, size },
-      }
-    );
+  listMyCategories: async () => {
+    const response = await api.get(`/api/categories`);
+    return Array.isArray(response.data) ? response.data : [];
+  },
+
+  updateCategory: async (id, data) => {
+    const response = await api.put(`/api/categories/${id}`, data);
+    return response.data;
+  },
+
+  deleteCategory: async (id) => {
+    const response = await api.delete(`/api/categories/${id}`);
     return response.data;
   },
 };

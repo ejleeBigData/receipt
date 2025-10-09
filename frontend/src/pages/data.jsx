@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import InputToday from "../components/receipt/InputToday";
+import InputToday from "../components/data/InputToday";
 import InputText from "../components/category/InputText";
-import InputDirect from "../components/receipt/InputDirect";
-import InputReceipt from "../components/receipt/InputReceipt";
+import InputDirect from "../components/data/InputDirect";
+import InputReceipt from "../components/data/InputReceipt";
 import Button from "../components/ui/Button";
 
 const Data = () => {
@@ -17,12 +17,6 @@ const Data = () => {
         required
       />
       <InputDirect />
-      <InputReceipt />
-      <InputText label="메모" inputWidthClass="w-2/3" />
-      <div className="flex gap-3 mt-5 justify-center">
-        <Button onClick={() => console.log("저장 클릭")}>저장</Button>
-        <Button>취소</Button>
-      </div>
     </div>
   );
 };

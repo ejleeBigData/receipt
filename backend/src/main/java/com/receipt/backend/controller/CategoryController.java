@@ -5,12 +5,11 @@ import com.receipt.backend.dto.CategoryResponse;
 import com.receipt.backend.service.CategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/categories")
@@ -24,14 +23,24 @@ public class CategoryController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<Page<CategoryResponse>> getUserCategories(
-            @PathVariable Long userId,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "50") int size
-    ) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<CategoryResponse> categories = categoryService.getUserCategories(userId, pageable);
+    @GetMapping
+    public ResponseEntity<List<CategoryResponse>> listMyCategories() {
+        List<CategoryResponse> categories = categoryService.getUserCategories();
         return ResponseEntity.ok(categories);
+    }
+    
+    @PutMapping("/{categoryId}")
+    public ResponseEntity<CategoryResponse> updateCategory(
+        @PathVariable Long categoryId,
+        @Valid @RequestBody CategoryRequest request
+    ) {
+        CategoryResponse response = categoryService.updateCategory(categoryId, request);
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{categoryId}")
+    public ResponseEntity<Void> deleteCategory(@PathVariable Long categoryId) {
+        categoryService.deleteCategory(categoryId);
+        return ResponseEntity.noContent().build();
     }
 }
