@@ -10,8 +10,8 @@ const CategoryForm = () => {
     createCategory,
     updateCategory,
     loading,
-    editingId, // 수정 타깃
-    cancelEdit, // 수정 취소
+    editingId, //수정 타깃
+    cancelEdit, //수정 취소
   } = useCategoryStore();
 
   const [form, setForm] = useState({
@@ -47,6 +47,7 @@ const CategoryForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isDup) return;
     try {
       if (editingId) {
         await updateCategory(editingId, form);
@@ -60,6 +61,16 @@ const CategoryForm = () => {
     }
   };
 
+  const nameKey = form.name.trim().toLowerCase();
+  const isDup = useMemo(() => {
+    if (!nameKey) return false;
+    return categories.some(
+      (c) =>
+        c.name?.trim().toLowerCase() === nameKey &&
+        (!editingId || c.id !== editingId)
+    );
+  }, [nameKey, categories, editingId]);
+
   return (
     <form
       onSubmit={handleSubmit}
@@ -68,8 +79,14 @@ const CategoryForm = () => {
       <div className="mb-3 border-b border-sky-200 pb-1 flex items-center gap-3">
         <h6 className="text-sky-600">{editingId ? "수정" : "신규 등록"}</h6>
         <span className="text-xs text-gray-500">
-          <span className="text-red-500">*</span> 은 필수 입력 항목입니다.
+          <span className="text-red-500">*</span> 은 필수 입력
         </span>
+        {"    "}
+        {isDup && (
+          <p className="text-xs text-red-500 mt-1">
+            '{form.name}'은(는) 이미 등록된 명칭입니다.
+          </p>
+        )}
       </div>
 
       <div className="overflow-x-auto md:overflow-visible">
@@ -142,7 +159,12 @@ const CategoryForm = () => {
             />
           </div>
           <div className="min-w-20 flex items-center gap-1">
-            <Button type="submit" variant="base" size="sm">
+            <Button
+              type="submit"
+              variant="base"
+              size="sm"
+              disabled={loading || isDup || !nameKey}
+            >
               {loading
                 ? editingId
                   ? "수정 중..."

@@ -28,7 +28,7 @@ public class CategoryController {
         List<CategoryResponse> categories = categoryService.getUserCategories();
         return ResponseEntity.ok(categories);
     }
-    
+
     @PutMapping("/{categoryId}")
     public ResponseEntity<CategoryResponse> updateCategory(
         @PathVariable Long categoryId,
