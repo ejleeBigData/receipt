@@ -3,29 +3,42 @@ import useAuthStore from "../store/authStore";
 import useCategoryStore from "../store/categoryStore";
 import Button from "../components/ui/Button";
 import Input from "../components/ui/Input";
+import LineItemHeader from "../components/data/LineItemHeader";
+import LineItemRow from "../components/data/LineItemRow";
 
 const Data = () => {
   const today = new Date().toISOString().split("T")[0];
+  const categoriesListId = "categories-datalist";
 
+  // 상단 기본 폼
   const [form, setForm] = useState({
     payed_at: today,
     name: "",
     memo: "",
-    category: "", // 표시용 이름
-    categoryId: null,
-    item: "",
-    price: "",
-    quantity: 1,
   });
+
+  // 하단 행 배열
+  const [rows, setRows] = useState([
+    { category: "", categoryId: null, item: "", price: "", quantity: 1 },
+  ]);
 
   const { user } = useAuthStore();
   const { categories, error, listMyCategories } = useCategoryStore();
 
   useEffect(() => {
     if (user?.id) listMyCategories(user.id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
-  // 이름->id 매핑
+  // 카테고리 이름 목록 (중복 제거 + 정렬)
+  const categoryNames = useMemo(() => {
+    const names = new Set(
+      (categories || []).map((c) => c?.name?.trim()).filter(Boolean)
+    );
+    return Array.from(names).sort((a, b) => a.localeCompare(b));
+  }, [categories]);
+
+  // 이름→id 매핑
   const nameToId = useMemo(() => {
     const m = new Map();
     (categories || []).forEach((c) => {
@@ -35,77 +48,104 @@ const Data = () => {
     return m;
   }, [categories]);
 
-  // datalist 표시용: 입력값으로 필터링(부분일치, 대소문자 무시)
-  const filteredCategoryNames = useMemo(() => {
-    const q = form.category.trim().toLowerCase();
-    const names = (categories || [])
-      .map((c) => c?.name?.trim())
-      .filter(Boolean);
-    if (!q)
-      return Array.from(new Set(names)).sort((a, b) => a.localeCompare(b));
-    return Array.from(new Set(names))
-      .filter((n) => n.toLowerCase().includes(q))
-      .sort((a, b) => a.localeCompare(b));
-  }, [categories, form.category]);
+  // 상단 기본 폼 핸들러
+  const handleChangeTop = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
 
-  const subtotal = (Number(form.price) || 0) * (Number(form.quantity) || 0);
+  // 행 변경 핸들러
+  const handleRowChange = (idx, e) => {
+    const { name, value, type } = e.target;
+    setRows((prev) => {
+      const next = [...prev];
+      const row = { ...next[idx] };
 
-  // ✅ 변경 핸들러: 숫자 캐스팅 + 카테고리 이름→id 동기화
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-
-    setForm((prev) => {
-      if (type === "checkbox") return { ...prev, [name]: checked };
-      if (name === "price")
-        return { ...prev, price: value === "" ? "" : Number(value) };
-      if (name === "quantity")
-        return { ...prev, quantity: value === "" ? "" : Number(value) };
-      if (name === "category") {
+      if (name === "price" || name === "quantity") {
+        row[name] = value === "" ? "" : Number(value);
+      } else if (name === "category") {
+        row.category = value;
         const trimmed = value.trim();
-        const id = nameToId.get(trimmed) ?? null;
-        return { ...prev, category: value, categoryId: id };
+        row.categoryId = nameToId.get(trimmed) ?? null;
+      } else {
+        row[name] = value;
       }
-      return { ...prev, [name]: value };
+
+      next[idx] = row;
+      return next;
     });
   };
 
-  // 카테고리 필드에서 포커스 아웃 시에도 동기화(타이핑만 하고 엔터 안친 경우)
-  const handleCategoryBlur = (e) => {
+  // 카테고리 blur 시 id 보정
+  const handleCategoryBlur = (idx, e) => {
     const v = e.target.value.trim();
-    setForm((prev) => ({ ...prev, categoryId: nameToId.get(v) ?? null }));
+    setRows((prev) => {
+      const next = [...prev];
+      next[idx] = { ...next[idx], categoryId: nameToId.get(v) ?? null };
+      return next;
+    });
   };
+
+  // 행 완성 여부
+  const isRowComplete = (r) =>
+    r.category?.trim() &&
+    r.item?.trim() &&
+    (Number(r.price) || 0) > 0 &&
+    (Number(r.quantity) || 0) > 0;
+
+  // 마지막 행이 완성되면 자동으로 새 행 추가
+  useEffect(() => {
+    const last = rows[rows.length - 1];
+    if (isRowComplete(last)) {
+      setRows((prev) => [
+        ...prev,
+        { category: "", categoryId: null, item: "", price: "", quantity: 1 },
+      ]);
+    }
+  }, [rows]); // rows가 바뀔 때마다 체크
+
+  // 한 행 삭제(옵션)
+  const removeRow = (idx) => {
+    setRows((prev) =>
+      prev.length <= 1 ? prev : prev.filter((_, i) => i !== idx)
+    );
+  };
+
+  const subtotal = (r) => (Number(r.price) || 0) * (Number(r.quantity) || 0);
+  const grandTotal = rows.reduce((acc, r) => acc + subtotal(r), 0);
 
   const handleReset = () => {
-    setForm({
-      payed_at: today,
-      name: "",
-      memo: "",
-      category: "",
-      categoryId: null,
-      item: "",
-      price: "",
-      quantity: 1,
-    });
+    setForm({ payed_at: today, name: "", memo: "" });
+    setRows([
+      { category: "", categoryId: null, item: "", price: "", quantity: 1 },
+    ]);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // ✅ 전송 페이로드 예시 (SpringBoot API에 맞게 키만 맞추면 됨)
+    // 전송용 payload (SpringBoot에 맞게 필드명만 조정하면 됨)
+    const items = rows
+      .filter(isRowComplete) // 빈 마지막 줄 제외
+      .map((r) => ({
+        categoryId: r.categoryId,
+        categoryName: r.category?.trim(),
+        item: r.item?.trim(),
+        price: Number(r.price) || 0,
+        quantity: Number(r.quantity) || 0,
+        subtotal: subtotal(r),
+      }));
+
     const payload = {
       payedAt: form.payed_at,
       storeName: form.name,
       memo: form.memo,
-      categoryId: form.categoryId, // ← 핵심: id 전송
-      item: form.item,
-      price: Number(form.price) || 0,
-      quantity: Number(form.quantity) || 0,
-      subtotal,
+      items,
+      total: items.reduce((a, b) => a + b.subtotal, 0),
     };
-    // TODO: 실제 저장 로직으로 교체
+
+    // TODO: 실제 저장 API 호출
     alert(JSON.stringify(payload, null, 2));
   };
-
-  const categoriesListId = "categories-datalist";
 
   return (
     <div className="m-5 p-8 border border-gray-300 rounded-lg shadow-sm bg-white font-gowun">
@@ -129,8 +169,8 @@ const Data = () => {
           )}
         </div>
 
+        {/* 1줄: 구매일 + 상점명 */}
         <div className="space-y-3">
-          {/* 1줄: 구매일 + 상점명 */}
           <div className="grid grid-cols-1 md:grid-cols-[14rem_minmax(0,1fr)] gap-3 items-center">
             <div className="flex items-center gap-2">
               <label htmlFor="payed_at" className="text-gray-700 shrink-0">
@@ -145,7 +185,7 @@ const Data = () => {
                   name="payed_at"
                   type="date"
                   value={form.payed_at}
-                  onChange={handleChange}
+                  onChange={handleChangeTop}
                   variant="data"
                 />
               </div>
@@ -163,7 +203,7 @@ const Data = () => {
                   name="name"
                   type="text"
                   value={form.name}
-                  onChange={handleChange}
+                  onChange={handleChangeTop}
                   placeholder="(예: 상점명_지점)"
                   variant="data"
                   required
@@ -172,113 +212,34 @@ const Data = () => {
             </div>
           </div>
 
-          {/* 헤더 (md 이상) */}
-          <div className="hidden md:grid md:grid-cols-[3fr_3fr_2fr_1fr_2fr] gap-2 px-1 text-sm text-gray-600 font-semibold">
-            <div>카테고리</div>
-            <div>내용</div>
-            <div>가격</div>
-            <div>수량</div>
-            <div>부분합</div>
-          </div>
+          <LineItemHeader />
 
-          {/* 인풋 행 */}
-          <div className="grid grid-cols-1 md:grid-cols-[3fr_3fr_2fr_1fr_2fr] gap-2 items-center">
-            <div>
-              <label
-                htmlFor="category"
-                className="md:hidden text-xs text-gray-500 mb-1"
-              >
-                카테고리
-              </label>
-              <Input
-                id="category"
-                name="category"
-                type="text"
-                value={form.category}
-                onChange={handleChange}
-                onBlur={handleCategoryBlur}
-                variant="data"
-                placeholder="카테고리 선택"
-                required
-                list={categoriesListId} // datalist 연결
-                onFocus={() => {
-                  if (!categories?.length && user?.id)
-                    listMyCategories(user.id);
-                }}
-              />
-              <datalist id={categoriesListId}>
-                {filteredCategoryNames.map((n) => (
-                  <option key={n} value={n} />
-                ))}
-              </datalist>
-            </div>
+          {rows.map((row, idx) => (
+            <LineItemRow
+              key={idx}
+              idx={idx}
+              row={row}
+              onChange={handleRowChange}
+              onCategoryBlur={handleCategoryBlur}
+              onRemove={removeRow}
+              datalistId={categoriesListId}
+              subtotal={subtotal}
+              canRemove={rows.length > 1 && idx < rows.length - 1}
+            />
+          ))}
 
-            {/* 내용 */}
-            <div>
-              <label
-                htmlFor="item"
-                className="md:hidden text-xs text-gray-500 mb-1"
-              >
-                내용
-              </label>
-              <Input
-                id="item"
-                name="item"
-                type="text"
-                value={form.item}
-                onChange={handleChange}
-                variant="data"
-                placeholder="예: 한돈 안심 600g"
-              />
-            </div>
+          {/* 공용 datalist (브라우저가 입력값에 맞춰 필터링) */}
+          <datalist id={categoriesListId}>
+            {categoryNames.map((n) => (
+              <option key={n} value={n} />
+            ))}
+          </datalist>
 
-            {/* 가격 */}
-            <div>
-              <label
-                htmlFor="price"
-                className="md:hidden text-xs text-gray-500 mb-1"
-              >
-                가격
-              </label>
-              <Input
-                id="price"
-                name="price"
-                type="number"
-                value={form.price}
-                onChange={handleChange}
-                variant="data"
-                inputMode="numeric"
-                min="0"
-                placeholder="예: 21000"
-              />
-            </div>
-
-            {/* 수량 */}
-            <div>
-              <label
-                htmlFor="quantity"
-                className="md:hidden text-xs text-gray-500 mb-1"
-              >
-                수량
-              </label>
-              <Input
-                id="quantity"
-                name="quantity"
-                type="number"
-                value={form.quantity}
-                onChange={handleChange}
-                variant="data"
-                inputMode="numeric"
-                min="0"
-                placeholder="1"
-              />
-            </div>
-
-            {/* 부분합 */}
-            <div className="text-right md:text-left font-medium tabular-nums px-2">
-              <span id="subtotal" className="text-gray-800 text-sm text-center">
-                {subtotal.toLocaleString()}
-              </span>
+          {/* 총합 */}
+          <div className="flex justify-end items-center pt-2 border-t border-gray-400">
+            <div className="text-sm text-gray-600 mr-2">총합</div>
+            <div className="font-semibold tabular-nums">
+              {grandTotal.toLocaleString()}
             </div>
           </div>
         </div>
@@ -294,7 +255,7 @@ const Data = () => {
               name="memo"
               type="text"
               value={form.memo}
-              onChange={handleChange}
+              onChange={handleChangeTop}
               variant="data"
             />
           </div>
