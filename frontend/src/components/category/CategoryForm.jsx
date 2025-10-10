@@ -1,7 +1,7 @@
 import { useMemo, useState, useEffect } from "react";
-import Button from "../ui/Button";
-import InputText from "./InputText";
 import useCategoryStore from "../../store/categoryStore";
+import Button from "../ui/Button";
+import Input from "../ui/Input";
 
 const CategoryForm = () => {
   const orders = useMemo(() => Array.from({ length: 50 }, (_, i) => i + 1), []);
@@ -10,8 +10,8 @@ const CategoryForm = () => {
     createCategory,
     updateCategory,
     loading,
-    editingId, //수정 타깃
-    cancelEdit, //수정 취소
+    editingId, // 수정 타깃
+    cancelEdit, // 수정 취소
   } = useCategoryStore();
 
   const [form, setForm] = useState({
@@ -39,10 +39,13 @@ const CategoryForm = () => {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setForm((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
+    setForm((prev) => {
+      let next = value;
+      if (type === "checkbox") next = checked;
+      else if (name === "sort") next = Number(value); // 셀렉트 → number
+      else if (name === "cut") next = value === "" ? "" : Number(value); // 빈값 허용
+      return { ...prev, [name]: next };
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -51,7 +54,7 @@ const CategoryForm = () => {
     try {
       if (editingId) {
         await updateCategory(editingId, form);
-        cancelEdit(); // 완료 후 편집 종료
+        cancelEdit();
       } else {
         await createCategory(form);
       }
@@ -84,33 +87,33 @@ const CategoryForm = () => {
         {"    "}
         {isDup && (
           <p className="text-xs text-red-500 mt-1">
-            '{form.name}'은(는) 이미 등록된 명칭입니다.
+            '{form.name}'은(는) 이미 등록된 카테고리명입니다.
           </p>
         )}
       </div>
 
       <div className="overflow-x-auto md:overflow-visible">
-        <div className="inline-flex items-center md:gap-4 whitespace-nowrap md:whitespace-normal w-max">
-          <div className="flex items-center gap-2">
-            <InputText
+        <div className="inline-flex items-center md:gap-2 whitespace-nowrap md:whitespace-normal w-max">
+          <div className="flex items-center gap-3">
+            <label htmlFor="name" className="text-gray-700 flex-shrink-0">
+              <span className="text-red-500" aria-hidden="true">
+                *
+              </span>{" "}
+              명칭
+            </label>
+
+            <Input
               id="name"
               name="name"
               type="text"
               value={form.name}
               onChange={handleChange}
-              label={
-                <>
-                  <span className="text-red-500" aria-hidden="true">
-                    *
-                  </span>{" "}
-                  명칭
-                </>
-              }
               placeholder="카테고리명"
-              inputWidthClass="w-[24ch]"
+              variant="category"
               required
             />
           </div>
+
           <div className="flex items-center gap-2 ml-3">
             <label htmlFor="sort" className="text-gray-700 flex-shrink-0">
               순서
@@ -129,36 +132,38 @@ const CategoryForm = () => {
               ))}
             </select>
           </div>
-          <div className="flex items-center gap-2 ml-5">
-            <label
-              htmlFor="accrue"
-              className="min-w-18 text-gray-700 flex-shrink-0"
-            >
+
+          <div className="flex items-center gap-2 ml-3">
+            <label htmlFor="accrue" className="text-gray-700 flex-shrink-0">
               누적 표시
             </label>
-            <input
+            <Input
               id="accrue"
               name="accrue"
               type="checkbox"
               checked={form.accrue}
               onChange={handleChange}
-              className="scale-110"
             />
           </div>
-          <div className="flex items-center gap-2 ml-4">
-            <InputText
+
+          <div className="flex items-center gap-2 ml-3 w-[16ch]">
+            <label htmlFor="cut" className="text-gray-700 flex-shrink-0">
+              상한선
+            </label>
+            <Input
               id="cut"
               name="cut"
-              label={<>상한선</>}
               type="number"
               value={form.cut}
               onChange={handleChange}
               placeholder="9999999"
-              inputWidthClass="w-[12ch]"
               min="0"
+              variant="category"
+              inputMode="numeric"
             />
           </div>
-          <div className="min-w-20 flex items-center gap-1">
+
+          <div className="min-w-[5rem] flex items-center gap-1 ml-5">
             <Button
               type="submit"
               variant="base"

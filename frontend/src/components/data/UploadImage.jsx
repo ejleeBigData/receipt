@@ -34,7 +34,7 @@ const UploadImage = ({ label = "영수증", onChange, maxSizeMB = 5 }) => {
         id={inputId}
         type="file"
         accept="image/*"
-        className="border border-gray-300 rounded-lg p-2 text-sm focus:border-sky-400 
+        className="border border-gray-300 rounded-lg p-1 text-sm focus:border-sky-400 
         focus:ring-2 focus:ring-sky-100 outline-none w-full"
         onChange={handleChange}
       />

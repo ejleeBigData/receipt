@@ -10,7 +10,7 @@ const Button = ({
   block = true,
   ...rest
 }) => {
-  // ✅ 오타 prop이 DOM으로 퍼지지 않도록 제거
+  // 오타 prop이 DOM으로 퍼지지 않도록 제거
   const { blcok: _ignoreBlcok, ...domProps } = rest;
 
   const width = block ? "w-full" : "w-auto";
@@ -23,15 +23,40 @@ const Button = ({
   };
 
   const variants = {
-    primary:
-      "bg-gradient-to-r from-amber-300 via-amber-700 to-amber-500 text-white hover:shadow-lg hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed",
-    secondary:
-      "bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:shadow-md hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed",
-    dark: "bg-gray-900 text-white hover:bg-gray-800 hover:shadow-md hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed",
-
-    base: "border border-stone-500 bg-gradient-to-b from-stone-500 to-stone-800 text-white rounded hover:shadow-md hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed",
-    basecancel:
-      "border border-yellow-700 bg-gradient-to-b from-yellow-700 to-yellow-800 text-white rounded hover:shadow-md hover:scale-[1.02] disabled:opacity-80 disabled:hover:scale-100 disabled:cursor-not-allowed",
+    primary: [
+      "text-white border border-amber-400",
+      "bg-gradient-to-b from-amber-400 via-amber-600 to-amber-700",
+      "hover:from-amber-500 hover:via-amber-700 hover:to-amber-800",
+      "hover:scale-[1.005]",
+      "disabled:hover:scale-100",
+      "shadow-inner/amber",
+    ].join(" "),
+    secondary: [
+      "bg-white border border-gray-300 text-gray-800",
+      "hover:bg-gray-50 hover:border-gray-400",
+      "hover: scale-[1.005]",
+      "disabled:hover:scale-100",
+    ].join(" "),
+    dark: [
+      "bg-gradient-to-b from-gray-800 to-gray-900 text-white border border-gray-900",
+      "hover:from-gray-800 hover:to-black",
+      "hover: scale-[1.005]",
+      "disabled:hover:scale-100",
+    ].join(" "),
+    base: [
+      "border border-stone-600 text-white rounded",
+      "bg-gradient-to-b from-stone-500 to-stone-800",
+      "hover:from-stone-600 hover:to-stone-900",
+      "hover:scale-[1.005]",
+      "disabled:hover:scale-100",
+    ].join(" "),
+    basecancel: [
+      "border border-yellow-800 text-white rounded",
+      "bg-gradient-to-b from-yellow-700 to-yellow-900",
+      "hover:from-yellow-800 hover:to-yellow-950",
+      "hover:scale-[1.005]",
+      "disabled:hover:scale-100",
+    ].join(" "),
   };
 
   return (

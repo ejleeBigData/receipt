@@ -1,4 +1,8 @@
 package com.receipt.backend.entity;
 
-public class OcrProcess {
+public enum OcrProcess {
+    ORIGIN,
+    DUMP,
+    ITEM,
+    REVIEW
 }
