@@ -4,9 +4,9 @@ import Input from "../ui/Input";
 const LineItemRow = ({
   idx,
   row, // { category, item, price, quantity, categoryId }
-  onChange, // (idx, event) => void
-  onCategoryBlur, // (idx, event) => void
-  onRemove, // (idx) => void
+  onChange, // (id, event) => void
+  onCategoryBlur, // (id, event) => void
+  onRemove, // (id) => void
   datalistId, // categories-datalist
   subtotal, // (row) => number
   canRemove, // boolean
@@ -24,8 +24,8 @@ const LineItemRow = ({
         name="category"
         type="text"
         value={row.category}
-        onChange={(e) => onChange(idx, e)}
-        onBlur={(e) => onCategoryBlur(idx, e)}
+        onChange={onChange}
+        onBlur={onCategoryBlur}
         variant="data"
         placeholder="카테고리"
         list={datalistId}
@@ -44,7 +44,7 @@ const LineItemRow = ({
         name="item"
         type="text"
         value={row.item}
-        onChange={(e) => onChange(idx, e)}
+        onChange={onChange}
         variant="data"
         placeholder="예: 한돈 안심 600g"
       />
@@ -62,7 +62,7 @@ const LineItemRow = ({
         name="price"
         type="number"
         value={row.price}
-        onChange={(e) => onChange(idx, e)}
+        onChange={onChange}
         variant="data"
         inputMode="numeric"
         min="0"
@@ -82,7 +82,7 @@ const LineItemRow = ({
         name="quantity"
         type="number"
         value={row.quantity}
-        onChange={(e) => onChange(idx, e)}
+        onChange={onChange}
         variant="data"
         inputMode="numeric"
         min="0"
@@ -97,7 +97,7 @@ const LineItemRow = ({
     <div className="flex justify-end items-center">
       <button
         type="button"
-        onClick={canRemove ? () => onRemove(idx) : undefined}
+        onClick={onRemove}
         title="추가행 삭제"
         aria-label="추가행 삭제"
         disabled={!canRemove}

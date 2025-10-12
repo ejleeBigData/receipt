@@ -1,5 +1,6 @@
 package com.receipt.backend.service;
 
+import com.receipt.backend.dto.StoreListItemResponse;
 import com.receipt.backend.dto.StoreRequest;
 import com.receipt.backend.dto.StoreResponse;
 import com.receipt.backend.entity.Category;
@@ -15,6 +16,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.List;
 
 @Service
@@ -31,6 +34,7 @@ public class StoreService {
         User currentUser = authenticationService.getCurrentUser();
 
         Store store = Store.builder()
+                .purchaseDate(request.getPurchaseDate())
                 .name(request.getName())
                 .memo(request.getMemo())
                 .user(currentUser)
@@ -58,6 +62,24 @@ public class StoreService {
         return toResponse(store);
     }
 
+    @Transactional(readOnly = true)
+    public List<StoreListItemResponse> listMyStoresItemByMonth(Integer year, Integer month)  {
+        User currentUser = authenticationService.getCurrentUser();
+
+        YearMonth ym;
+        if (year == null || month == null) {
+            ym = YearMonth.now();
+        } else {
+            ym = YearMonth.of(year, month);
+        }
+        LocalDate start = ym.atDay(1);
+        LocalDate end = ym.atEndOfMonth();
+
+        List<Store> stores = storeRepository.findByUserIdWithItems(currentUser.getId());
+
+        return storeRepository.findListForUserByMonth(currentUser.getId(), start, end);
+    }
+
     private StoreResponse toResponse(Store store) {
         List<com.receipt.backend.dto.ItemResponse> itemResponses =
                 store.getItems() == null ? List.<com.receipt.backend.dto.ItemResponse>of() :
@@ -76,10 +98,9 @@ public class StoreService {
 
         return com.receipt.backend.dto.StoreResponse.builder()
                 .id(store.getId())
+                .purchaseDate(store.getPurchaseDate())
                 .name(store.getName())
                 .memo(store.getMemo())
-                .createdAt(store.getCreatedAt())
-                .updatedAt(store.getUpdatedAt())
                 .items(itemResponses)
                 .build();
     }

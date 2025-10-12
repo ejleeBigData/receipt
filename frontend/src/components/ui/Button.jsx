@@ -51,8 +51,8 @@ const Button = ({
       "disabled:hover:scale-100",
     ].join(" "),
     basecancel: [
-      "border border-yellow-800 text-white rounded",
-      "bg-gradient-to-b from-yellow-700 to-yellow-900",
+      "border border-yellow-700 text-white rounded",
+      "bg-gradient-to-b from-yellow-600 to-yellow-900",
       "hover:from-yellow-800 hover:to-yellow-950",
       "hover:scale-[1.005]",
       "disabled:hover:scale-100",

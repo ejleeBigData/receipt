@@ -21,6 +21,16 @@ const CategoryForm = () => {
     cut: "",
   });
 
+  const nameKey = form.name.trim().toLowerCase();
+  const isDup = useMemo(() => {
+    if (!nameKey) return false;
+    return categories.some(
+      (c) =>
+        c.name?.trim().toLowerCase() === nameKey &&
+        (!editingId || c.id !== editingId)
+    );
+  }, [nameKey, categories, editingId]);
+
   useEffect(() => {
     if (editingId) {
       const target = categories.find((c) => c.id === editingId);
@@ -50,7 +60,7 @@ const CategoryForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (isDup) return;
+    if (!form.name.trim() || isDup) return;
     try {
       if (editingId) {
         await updateCategory(editingId, form);
@@ -63,16 +73,6 @@ const CategoryForm = () => {
       console.error("Error creating category:", error);
     }
   };
-
-  const nameKey = form.name.trim().toLowerCase();
-  const isDup = useMemo(() => {
-    if (!nameKey) return false;
-    return categories.some(
-      (c) =>
-        c.name?.trim().toLowerCase() === nameKey &&
-        (!editingId || c.id !== editingId)
-    );
-  }, [nameKey, categories, editingId]);
 
   return (
     <form
@@ -168,7 +168,7 @@ const CategoryForm = () => {
               type="submit"
               variant="base"
               size="sm"
-              disabled={loading || isDup || !nameKey}
+              disabled={loading || isDup}
             >
               {loading
                 ? editingId

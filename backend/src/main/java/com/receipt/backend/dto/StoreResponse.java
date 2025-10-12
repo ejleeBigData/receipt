@@ -1,8 +1,9 @@
 package com.receipt.backend.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 @Getter
@@ -14,8 +15,9 @@ public class StoreResponse {
     private Long id;
     private String name;
     private String memo;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+
+    @JsonFormat(pattern = "yyyyMMdd")
+    private LocalDate purchaseDate;
 
     private List<ItemResponse> items;
     private List<CategoryResponse> categories;

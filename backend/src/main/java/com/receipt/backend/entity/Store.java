@@ -5,6 +5,7 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,10 +15,8 @@ import java.util.List;
         name = "stores",
         indexes = {
                 @Index(name = "idx_stores_user_id", columnList = "user_id"),
+                @Index(name = "idx_store_user_date", columnList = "user_id, purchase_date")
 
-        },
-        uniqueConstraints = {
-                @UniqueConstraint(name = "uk_stores_name", columnNames = {"name"})
         }
 )
 @Getter
@@ -31,6 +30,9 @@ public class Store {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "purchase_date", nullable = false)
+    private LocalDate purchaseDate;
+
     @Column(nullable = false, length = 200)
     private String name;
 
@@ -42,6 +44,7 @@ public class Store {
     private User user;
 
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Item> items = new ArrayList<>();
 
     @CreationTimestamp
