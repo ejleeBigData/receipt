@@ -4,6 +4,14 @@ spring:
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      idle-timeout: 300000      # 5분
+      connection-timeout: 30000 # 30초
+      max-lifetime: 1800000     # 30분 (RDS 등에서는 10~30분 권장)
+  jackson:
+    time-zone: Asia/Seoul
   jpa:
     hibernate:
       ddl-auto: update

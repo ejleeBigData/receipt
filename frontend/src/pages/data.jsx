@@ -159,7 +159,7 @@ const Data = () => {
     //console.log(JSON.stringify(payload, null, 2));
     try {
       await createStoreAction(payload);
-      handleReset(); //성공 후 초기화
+      handleReset();
     } catch (err) {
       console.error("Error creating store:", err);
     }
@@ -182,9 +182,7 @@ const Data = () => {
               <span className="text-red-500">*</span> 필수 입력
             </span>
             {error && (
-              <span className="text-xs text-red-500">
-                카테고리 로드 오류: {String(error)}
-              </span>
+              <span className="text-xs text-red-500">🚩{String(error)}</span>
             )}
           </div>
 

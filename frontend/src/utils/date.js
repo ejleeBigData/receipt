@@ -27,3 +27,10 @@ export const toYyyyMMdd = (input) => {
 
   return "";
 };
+
+export const fmtDay = (input) => {
+  const yyyymmdd = toYyyyMMdd(input); // "20251012" 형태
+  if (!yyyymmdd || yyyymmdd.length !== 8) return "-";
+  const dd = yyyymmdd.slice(6, 8); // "12" or "01"
+  return String(Number(dd)); // "01" -> "1"
+};

@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import useCategoryStore from "../../store/categoryStore";
 import Button from "../ui/Button";
 import Input from "../ui/Input";
@@ -20,6 +20,7 @@ const CategoryForm = () => {
     accrue: false,
     cut: "",
   });
+  const nameInputRef = useRef(null);
 
   const nameKey = form.name.trim().toLowerCase();
   const isDup = useMemo(() => {
@@ -44,6 +45,7 @@ const CategoryForm = () => {
       }
     } else {
       setForm({ name: "", sort: 1, accrue: false, cut: "" });
+      setTimeout(() => nameInputRef.current?.focus(), 0);
     }
   }, [editingId, categories]);
 
@@ -52,8 +54,8 @@ const CategoryForm = () => {
     setForm((prev) => {
       let next = value;
       if (type === "checkbox") next = checked;
-      else if (name === "sort") next = Number(value); // 셀렉트 → number
-      else if (name === "cut") next = value === "" ? "" : Number(value); // 빈값 허용
+      else if (name === "sort") next = Number(value);
+      else if (name === "cut") next = value === "" ? "" : Number(value);
       return { ...prev, [name]: next };
     });
   };
@@ -69,6 +71,7 @@ const CategoryForm = () => {
         await createCategory(form);
       }
       setForm({ name: "", sort: 1, accrue: false, cut: "" });
+      setTimeout(() => nameInputRef.current?.focus(), 0);
     } catch (error) {
       console.error("Error creating category:", error);
     }
@@ -111,6 +114,8 @@ const CategoryForm = () => {
               placeholder="카테고리명"
               variant="category"
               required
+              ref={nameInputRef}
+              autoFocus
             />
           </div>
 
