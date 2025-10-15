@@ -1,14 +1,13 @@
-// src/components/store/StoreList.jsx
 import { useEffect, useMemo, useState } from "react";
 import useAuthStore from "../../store/authStore";
 import useStoreStore from "../../store/storeStore";
-import { RiDeleteBin5Line } from "react-icons/ri";
+import { BiPen, BiTrash } from "react-icons/bi";
 import { fmtDay } from "../../utils/date";
 
 const toNum = (v) => (typeof v === "number" ? v : Number(v) || 0);
+const monthOptions = Array.from({ length: 12 }, (_, i) => i + 1);
 
 const StoreList = () => {
-  // 기본값: 오늘 연/월
   const now = new Date();
   const [year, setYear] = useState(now.getFullYear());
   const [month, setMonth] = useState(now.getMonth() + 1);
@@ -17,18 +16,14 @@ const StoreList = () => {
   const { stores, loading, error, listMyStoresItemByMonth } = useStoreStore();
 
   useEffect(() => {
-    listMyStoresItemByMonth(year, month);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [year, month]);
+    listMyStoresItemByMonth(year, month).then((list) => {
+      console.log("[StoreList] :", list);
+    });
+  }, [year, month, listMyStoresItemByMonth]);
 
   // 총합
   const grandTotal = useMemo(() => {
-    return (stores || []).reduce((acc, it) => {
-      const price = toNum(it.price);
-      const qty = toNum(it.quantity);
-      const sub = toNum(it.subtotal) || price * qty;
-      return acc + sub;
-    }, 0);
+    return (stores || []).reduce((acc, it) => acc + toNum(it.totalPrice), 0);
   }, [stores]);
 
   // 연/월 셀렉트 옵션, 필요에 따라 범위 조정
@@ -36,8 +31,6 @@ const StoreList = () => {
     const base = now.getFullYear();
     return [base - 1, base, base + 1];
   }, []);
-
-  const monthOptions = Array.from({ length: 12 }, (_, i) => i + 1);
 
   return (
     <div className="mx-5 mb-5 p-3 border border-gray-300 rounded-lg shadow-sm bg-white font-gowun text-xs">
@@ -66,7 +59,7 @@ const StoreList = () => {
           ))}
         </select>
         {loading && <span className="text-gray-500 ml-2">불러오는 중…</span>}
-        {error && <span className="text-red-500 ml-2">{String(error)}</span>}
+        {error && <span className="text-red-500 ml-2">🚩{String(error)}</span>}
       </div>
 
       <div className="hidden md:grid md:grid-cols-[0.5fr_1fr_2fr_3fr_1fr_0.5fr_0.5fr_1fr_auto] gap-2 text-gray-600 border-b border-gray-200 pb-2">
@@ -88,16 +81,12 @@ const StoreList = () => {
           </div>
         ) : (
           (stores || []).map((it) => {
-            const id =
-              it.id ?? `${it.payedAt}-${it.item}-${it.categoryId ?? ""}`;
-            const storeName = it.storeName;
+            const id = it.id;
             const purchaseDate = fmtDay(it.purchaseDate);
-            const categoryName = it.categoryName ?? it.category?.name ?? "-";
-            const itemTitle = it.itemTitle ?? it.anyItemName ?? "-";
+            const categoryName = it.categoryName ?? "-";
+            const itemNames = it.itemNames ?? "-";
             const totalAmount = toNum(it.totalAmount);
-            const price = toNum(it.price ?? 0);
-            const qty = toNum(it.quantity);
-            const subtotal = toNum(it.subtotal) || price * qty;
+            const quantity = toNum(it.itemQuantity);
             const memo = it.memo ?? "-";
 
             return (
@@ -105,44 +94,32 @@ const StoreList = () => {
                 key={id}
                 className="py-2 grid grid-cols-1 md:grid-cols-[0.5fr_1fr_2fr_3fr_1fr_0.5fr_0.5fr_1fr_auto] gap-2 items-center"
               >
-                {/* 구매일 */}
                 <div className="text-gray-800">{purchaseDate}</div>
-                <div className="text-gray-800">{storeName}</div>
-
-                {/* 카테고리 */}
+                <div className="text-gray-800">{it.storeName}</div>
                 <div>{categoryName}</div>
-
-                <div className="break-words">{itemTitle}</div>
+                <div className="break-words">{itemNames}</div>
                 <div className="tabular-nums">
                   {totalAmount.toLocaleString()}
                 </div>
-
-                <div className="tabular-nums">{qty.toLocaleString()}</div>
-
-                {/* 부분합 */}
+                <div className="tabular-nums">{quantity.toLocaleString()}</div>
                 <div className="font-medium tabular-nums">
-                  {subtotal.toLocaleString()}
+                  {totalAmount.toLocaleString()}
                 </div>
                 <div>{memo}</div>
 
                 <div className="flex justify-end">
-                  <button
-                    type="button"
-                    disabled
-                    title="상점,내용 모두 삭제"
-                    className="p-1 rounded opacity-40 cursor-not-allowed"
-                  >
-                    <RiDeleteBin5Line size={15} />
-                  </button>
+                  <BiPen size={20} title="수정" />
+                  <BiTrash size={20} title="삭제" />
                 </div>
 
                 {/* 모바일 라벨 (md 미만일 때 보기 쉽게) */}
                 <div className="md:hidden mt-2 text-xs text-gray-500 col-span-1">
                   <div>카테고리: {categoryName}</div>
                   <div>
-                    가격×수량: {price.toLocaleString()} × {qty.toLocaleString()}
+                    가격×수량: {totalAmount.toLocaleString()}
+                    {quantity.toLocaleString()}
                   </div>
-                  <div>부분합: {subtotal.toLocaleString()}</div>
+                  <div>부분합: {totalAmount.toLocaleString()}</div>
                 </div>
               </div>
             );

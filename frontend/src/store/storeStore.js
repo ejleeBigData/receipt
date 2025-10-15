@@ -32,6 +32,7 @@ const useStoreStore = create((set, get) => ({
     try {
       const list = await storeService.listMyStoresItemByMonth(year, month);
       set({ stores: list, loading: false });
+      //console.log(list);
       return list;
     } catch (err) {
       set({
