@@ -23,7 +23,7 @@ const StoreList = () => {
 
   // 총합
   const grandTotal = useMemo(() => {
-    return (stores || []).reduce((acc, it) => acc + toNum(it.totalPrice), 0);
+    return (stores || []).reduce((acc, it) => acc + toNum(it.totalAmount), 0);
   }, [stores]);
 
   // 연/월 셀렉트 옵션, 필요에 따라 범위 조정
@@ -62,7 +62,7 @@ const StoreList = () => {
         {error && <span className="text-red-500 ml-2">🚩{String(error)}</span>}
       </div>
 
-      <div className="hidden md:grid md:grid-cols-[0.5fr_1fr_2fr_3fr_1fr_0.5fr_0.5fr_1fr_auto] gap-2 text-gray-600 border-b border-gray-200 pb-2">
+      <div className="hidden md:grid md:grid-cols-[0.5fr_1fr_1fr_2fr_1fr_0.5fr_0.5fr_1fr_auto] gap-2 text-gray-600 border-b border-gray-200 pb-2">
         <div>구매일</div>
         <div>상점</div>
         <div>카테고리</div>
@@ -81,7 +81,8 @@ const StoreList = () => {
           </div>
         ) : (
           (stores || []).map((it) => {
-            const id = it.id;
+            const id = it.itemId;
+            const storeName = it.storeName;
             const purchaseDate = fmtDay(it.purchaseDate);
             const categoryName = it.categoryName ?? "-";
             const itemNames = it.itemNames ?? "-";
@@ -92,10 +93,10 @@ const StoreList = () => {
             return (
               <div
                 key={id}
-                className="py-2 grid grid-cols-1 md:grid-cols-[0.5fr_1fr_2fr_3fr_1fr_0.5fr_0.5fr_1fr_auto] gap-2 items-center"
+                className="py-2 grid grid-cols-1 md:grid-cols-[0.5fr_1fr_1fr_2fr_1fr_0.5fr_0.5fr_1fr_auto] gap-2 items-center"
               >
                 <div className="text-gray-800">{purchaseDate}</div>
-                <div className="text-gray-800">{it.storeName}</div>
+                <div className="text-gray-800">{storeName}</div>
                 <div>{categoryName}</div>
                 <div className="break-words">{itemNames}</div>
                 <div className="tabular-nums">
@@ -108,8 +109,8 @@ const StoreList = () => {
                 <div>{memo}</div>
 
                 <div className="flex justify-end">
-                  <BiPen size={20} title="수정" />
-                  <BiTrash size={20} title="삭제" />
+                  <BiPen size={20} title="수정" className="cursor-pointer" />
+                  <BiTrash size={20} title="삭제" className="cursor-pointer" />
                 </div>
 
                 {/* 모바일 라벨 (md 미만일 때 보기 쉽게) */}

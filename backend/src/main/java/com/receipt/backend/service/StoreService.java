@@ -91,6 +91,8 @@ public class StoreService {
                 .toList();
     }
 
+
+
     public void deleteStore(Long storeId) {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(()-> new ResourceNotFoundException("해당 상점 정보 없음"));

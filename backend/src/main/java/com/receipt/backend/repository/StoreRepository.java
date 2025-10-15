@@ -30,8 +30,7 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
             s.purchase_date                        AS purchase_date,
             COUNT(i.id)                            AS item_count,
             COALESCE(SUM(i.price * i.quantity),0)  AS total_price,
-            MIN(i.id)                              AS first_item_id,
-            MIn(i.name)                            AS first_item_name
+            MIN(i.id)                              AS first_item_id
           FROM stores s
           LEFT JOIN items i ON i.store_id = s.id
           WHERE s.user_id = :userId
@@ -47,8 +46,8 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
           a.total_price    AS "totalAmount",
           CASE
             WHEN a.item_count = 0 THEN NULL
-            WHEN a.item_count = 1 THEN a.first_item_name
-            ELSE a.first_item_name || ' 외 ' || (a.item_count - 1) || '건'
+            WHEN a.item_count = 1 THEN fi.name
+            ELSE fi.name || ' 외 ' || (a.item_count - 1) || '건'
           END              AS "itemNames",
           c.name           AS "categoryName",
           fi.id            AS "itemId" ,
