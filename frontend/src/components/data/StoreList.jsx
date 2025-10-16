@@ -74,7 +74,7 @@ const StoreList = () => {
         <div></div>
       </div>
 
-      <div className="divide-y divide-gray-100">
+      <div>
         {(stores || []).length === 0 && !loading ? (
           <div className="py-8 text-center text-sm text-gray-500">
             데이터가 없습니다.
@@ -93,7 +93,8 @@ const StoreList = () => {
             return (
               <div
                 key={id}
-                className="py-2 grid grid-cols-1 md:grid-cols-[0.5fr_1fr_1fr_2fr_1fr_0.5fr_0.5fr_1fr_auto] gap-2 items-center"
+                className="py-2 grid grid-cols-1 md:grid-cols-[0.5fr_1fr_1fr_2fr_1fr_0.5fr_0.5fr_1fr_auto] gap-2 items-center
+                 odd:bg-white even:bg-gray-50 hover:bg-lime-100 transition-colors"
               >
                 <div className="text-gray-800">{purchaseDate}</div>
                 <div className="text-gray-800">{storeName}</div>

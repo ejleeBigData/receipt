@@ -64,6 +64,40 @@ public class StoreService {
         return toResponse(store);
     }
 
+    public StoreResponse updateStore(Long storeId, StoreRequest request) {
+        User currentUser = authenticationService.getCurrentUser();
+
+        Store store = Store.builder()
+                .purchaseDate(request.getPurchaseDate())
+                .name(request.getName())
+                .memo(request.getMemo())
+                .user(currentUser)
+                .build();
+        storeRepository.save(store);
+
+
+        if (request.getItems() != null && !request.getItems().isEmpty()) {
+            for (var itemReq : request.getItems()) {
+                Category category = categoryRepository.findById(itemReq.getCategoryId())
+                        .orElseThrow(() -> new ResourceNotFoundException("선택한 카테고리 정보가 없습니다"));
+
+                Item item = Item.builder()
+                        .name(itemReq.getName())
+                        .price(itemReq.getPrice())
+                        .quantity(itemReq.getQuantity())
+                        .category(category)
+                        .store(store)
+                        .user(currentUser)
+                        .build();
+
+                itemRepository.save(item);
+            }
+        }
+
+        return toResponse(store);
+    }
+
+
     @Transactional(readOnly = true)
     public List<StoreListItemResponse> listMyStoresItemByMonth(Integer year, Integer month) {
         User currentUser = authenticationService.getCurrentUser();

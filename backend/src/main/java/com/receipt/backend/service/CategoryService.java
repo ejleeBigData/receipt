@@ -54,10 +54,10 @@ public class CategoryService {
     }
 
     public CategoryResponse updateCategory(Long categoryId, CategoryRequest request) {
-        User currentUser = authenticationService.getCurrentUser();
-
         Category category =  categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new ResourceNotFoundException("카테고리 정보 없음"));
+
+        User currentUser = authenticationService.getCurrentUser();
 
         if (!category.getUser().getId().equals(currentUser.getId())) {
             throw new UnauthorizedException("카테고리의 회원정보와 불일치");
@@ -90,7 +90,7 @@ public class CategoryService {
             throw new UnauthorizedException("해당 카테고리의 회원 정보와 불일치");
         }
 
-        //하위 데이터 먼저 삭제??
+        //카테고리 해당 데이터 먼저 삭제??
         categoryRepository.deleteById(categoryId);
     }
 
