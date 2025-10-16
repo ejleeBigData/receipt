@@ -33,6 +33,10 @@ const StoreList = () => {
     return [base - 1, base, base + 1];
   }, []);
 
+  const handleUpdate = async (storeId, itemCount) => {
+    window.alert("준비중" + storeId + "-" + itemCount);
+  };
+
   const handleDelete = async (storeId) => {
     if (!window.confirm("정말 삭제하시겠습니까?")) return;
 
@@ -105,6 +109,7 @@ const StoreList = () => {
             const totalAmount = toNum(it.totalAmount);
             const quantity = toNum(it.itemQuantity);
             const memo = it.memo ?? "-";
+            const itemCount = it.itemCount;
 
             return (
               <div
@@ -127,7 +132,12 @@ const StoreList = () => {
                 <div>{memo}</div>
 
                 <div className="flex justify-end">
-                  <BiPen size={20} title="수정" className="cursor-pointer" />
+                  <BiPen
+                    size={20}
+                    title="수정"
+                    className="cursor-pointer"
+                    onClick={() => handleUpdate(storeId, itemCount)}
+                  />
                   <BiTrash
                     size={20}
                     title="삭제"
