@@ -13,7 +13,8 @@ const StoreList = () => {
   const [month, setMonth] = useState(now.getMonth() + 1);
 
   const { user } = useAuthStore();
-  const { stores, loading, error, listMyStoresItemByMonth } = useStoreStore();
+  const { stores, loading, error, listMyStoresItemByMonth, deleteStore } =
+    useStoreStore();
 
   useEffect(() => {
     listMyStoresItemByMonth(year, month).then((list) => {
@@ -31,6 +32,20 @@ const StoreList = () => {
     const base = now.getFullYear();
     return [base - 1, base, base + 1];
   }, []);
+
+  const handleDelete = async (storeId) => {
+    if (!window.confirm("정말 삭제하시겠습니까?")) return;
+
+    try {
+      await deleteStore(storeId);
+      alert("삭제되었습니다.");
+
+      await listMyStoresItemByMonth(year, month);
+    } catch (err) {
+      alert("삭제 중 오류가 발생했습니다.");
+      console.error(err);
+    }
+  };
 
   return (
     <div className="mx-5 mb-5 p-3 border border-gray-300 rounded-lg shadow-sm bg-white font-gowun text-xs">
@@ -82,6 +97,7 @@ const StoreList = () => {
         ) : (
           (stores || []).map((it) => {
             const id = it.itemId;
+            const storeId = it.storeId;
             const storeName = it.storeName;
             const purchaseDate = fmtDay(it.purchaseDate);
             const categoryName = it.categoryName ?? "-";
@@ -107,11 +123,17 @@ const StoreList = () => {
                 <div className="font-medium tabular-nums">
                   {totalAmount.toLocaleString()}
                 </div>
+
                 <div>{memo}</div>
 
                 <div className="flex justify-end">
                   <BiPen size={20} title="수정" className="cursor-pointer" />
-                  <BiTrash size={20} title="삭제" className="cursor-pointer" />
+                  <BiTrash
+                    size={20}
+                    title="삭제"
+                    className="cursor-pointer"
+                    onClick={() => handleDelete(storeId)}
+                  />
                 </div>
 
                 {/* 모바일 라벨 (md 미만일 때 보기 쉽게) */}

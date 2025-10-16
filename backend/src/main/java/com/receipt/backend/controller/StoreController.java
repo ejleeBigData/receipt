@@ -34,4 +34,19 @@ public class StoreController {
     ) {
         return storeService.listMyStoresItemByMonth(year, month);
     }
+
+    @PutMapping("/{storeId}")
+    public ResponseEntity<StoreResponse> updateStore(
+            @PathVariable Long storeId,
+            @Valid @RequestBody StoreRequest request
+    ) {
+        StoreResponse response = storeService.updateStore(storeId, request);
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{storeId}")
+    public ResponseEntity<Void> deleteStore(@PathVariable Long storeId) {
+        storeService.deleteStore(storeId);
+        return ResponseEntity.noContent().build();
+    }
 }

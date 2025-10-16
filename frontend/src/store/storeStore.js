@@ -42,6 +42,44 @@ const useStoreStore = create((set, get) => ({
       return [];
     }
   },
+
+  updateStore: async (storeId, data) => {
+    set({ loading: true, error: null });
+    try {
+      const updated = await storeService.updateStore(storeId, data);
+      set((state) => ({
+        stores: state.stores.map((s) =>
+          s.id === storeId ? { ...s, ...updated } : s
+        ),
+        loading: false,
+      }));
+      return updated;
+    } catch (err) {
+      set({
+        error: err?.response?.data?.message ?? "Failed to update store",
+        loading: false,
+      });
+      throw err;
+    }
+  },
+
+  deleteStore: async (storeId) => {
+    set({ loading: true, error: null });
+    try {
+      await storeService.deleteStore(storeId);
+      set((state) => ({
+        stores: state.stores.filter((s) => s.id !== storeId),
+        loading: false,
+      }));
+      return true;
+    } catch (err) {
+      set({
+        error: err?.response?.data?.message ?? "Failed to delete store",
+        loading: false,
+      });
+      throw err;
+    }
+  },
 }));
 
 export default useStoreStore;
